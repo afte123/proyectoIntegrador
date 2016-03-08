@@ -1,10 +1,8 @@
-package Comun;
+package comun;
 import java.io.Serializable;
 
-import processing.core.*;
 
 public class Mensaje implements Serializable {
-	PApplet app;
 	String mensaje;
 	int origen;
 	int x,y;
