@@ -17,7 +17,7 @@ public class Comunicacion extends Thread {
 	private String command="";
 	private byte[] buzon;
 	private DatagramPacket pRecibir;
-	
+	//dddddd
 	Comunicacion(){
 
 		try {
