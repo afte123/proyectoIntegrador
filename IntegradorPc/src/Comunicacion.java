@@ -9,7 +9,7 @@ import java.net.DatagramSocket;
 import java.net.SocketException;
 
 import processing.core.*;
-public class Comunicacion {
+public class Comunicacion extends Thread {
 
 	private final int PORT = 5000;
 	private DatagramSocket socket;
@@ -45,7 +45,7 @@ public class Comunicacion {
 				socket.receive(packet);
 				command= new String(packet.getData(),0,packet.getLength());
 				
-				
+				System.out.println(command);
 				
 				
 		

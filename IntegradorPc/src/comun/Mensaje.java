@@ -3,34 +3,21 @@ import java.io.Serializable;
 
 
 public class Mensaje implements Serializable {
-	String mensaje;
-	int origen;
-	int x,y;
-	public Mensaje(String mensaje, int origen) {
-		this.mensaje = mensaje;
-		this.origen = origen;
-	}
-	
-	public Mensaje (String mensaje, int x, int y){
-		this.mensaje = mensaje;
-		this.x=x;
-		this.y=y;
+	String nombre, contra, separar;
+
+
+	public Mensaje (String nombre,String separar, String contra){
+		this.separar=separar;
+		this.nombre=nombre;
+		this.contra=contra;
 	}
 
-	public int getOrigen(){
-		return origen;
-	}
-	
-	public String getMensaje() {
-		return mensaje;
+	public String getNombre(){
+		return nombre;
 	}
 
-	public int getX() {
-		return x;
-	}
-
-	public int getY() {
-		return y;
+	public String getContra() {
+		return contra;
 	}
 
 }
