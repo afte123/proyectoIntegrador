@@ -11,10 +11,9 @@ import java.net.SocketException;
 import comun.Mensaje;
 import processing.core.*;
 public class Comunicacion extends Thread {
-
+	//Mensaje mensaje;
 	private final int PORT = 5000;
 	private DatagramSocket socket;
-	private DatagramPacket packet;
 	private String command="";
 	private byte[] buzon;
 	private DatagramPacket pRecibir;
@@ -28,7 +27,7 @@ public class Comunicacion extends Thread {
 
 			// Create the buffer and the receiving packet
 			byte[] buffer = new byte[2364];
-			packet = new DatagramPacket(buffer, buffer.length);
+			//packet = new DatagramPacket(buffer, buffer.length);
 
 		} catch (SocketException e) {
 			// TODO Auto-generated catch block
@@ -37,44 +36,45 @@ public class Comunicacion extends Thread {
 	}
 	
 	
-	public Object recibir() throws IOException, ClassNotFoundException {
-		buzon = new byte[1025];
-		pRecibir = new DatagramPacket(buzon, buzon.length);
-		
-			socket.receive(pRecibir);
-			Object obj = deserializar(buzon);
-			System.out.println(buzon);
-			return obj;
-
-	}
+	
 
 	public void run() {
 		
 		while (true) {
-			Mensaje mensaje;
+			
 			try {
 				// Receive packets and process the information
-				mensaje = (Mensaje) recibir();
-				socket.receive(packet);
-				command= new String(packet.getData(),0,packet.getLength());
-				
-				System.out.println(command);
+				recibir();
+				sleep(10);
 				
 				
-		
-				
-				
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			} catch (ClassNotFoundException e) {
+			}catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 	}
 	
-	
+public void recibir() {
+		
+		buzon = new byte[2225];
+		pRecibir = new DatagramPacket(buzon, buzon.length);
+		
+		try {
+			socket.receive(pRecibir);
+			Mensaje mensaje = deserializar(pRecibir.getData());
+			
+			//Object obj = deserializar(buzon);
+			System.out.println(mensaje.getNombre());
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+		}
+		
+
+
+
+	}
 	
 	
 	
@@ -91,14 +91,23 @@ public class Comunicacion extends Thread {
 
 	}
 
-	public Object deserializar(byte[] des) throws IOException,
-			ClassNotFoundException {
+	public Mensaje deserializar(byte[] des){
 		ByteArrayInputStream bais = new ByteArrayInputStream(des);
-		ObjectInputStream is = new ObjectInputStream(bais);
-		Object obj = (Object) is.readObject();
-		is.close();
+		Mensaje msj=null;
+		
+		try {
+			ObjectInputStream is = new ObjectInputStream(bais);
+			msj = (Mensaje) is.readObject();
+			is.close();
+			
+		} catch (Exception e) {
+			// TODO: handle exception
+			e.printStackTrace();
+			
 
-		return obj;
+		}
+
+		return msj;
 
 	}
 }
