@@ -8,6 +8,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
+
 import comun.Mensaje;
 import processing.core.*;
 public class Comunicacion extends Thread {
@@ -108,6 +109,6 @@ public void recibir() {
 		}
 
 		return msj;
-
 	}
+
 }
