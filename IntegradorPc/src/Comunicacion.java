@@ -8,62 +8,85 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.SocketException;
 
-
 import comun.Mensaje;
 import processing.core.*;
+
 public class Comunicacion extends Thread {
-	//Mensaje mensaje;
+	// Mensaje mensaje;
 
 	private final int PORT = 5000;
 	private DatagramSocket socket;
 	private byte[] buzon;
-	private DatagramPacket pRecibir;
-	//Declaramos la clase de manejo de XML
+	private DatagramPacket packete;
+	// Declaramos la clase de manejo de XML
 	private XMLUsers xml;
-	
-	Comunicacion(PApplet app){
+
+	Comunicacion(PApplet app) {
 		try {
 			xml = new XMLUsers(app);
-			//La inicializamos
+			// La inicializamos
 			socket = new DatagramSocket(PORT);
-			System.out.println("UDP socket open and waiting data");
+			System.out.println("Esperando datos");
 		} catch (SocketException e) {
 			e.printStackTrace();
 		}
 	}
-	
+
 	public void run() {
 		while (true) {
 			try {
-				//Recibimos mensajes constantemente
+				// Recibimos mensajes constantemente
 				recibir();
 				sleep(10);
-			}catch (InterruptedException e) {
+			} catch (InterruptedException e) {
 				e.printStackTrace();
 			}
 		}
 	}
-	
-public void recibir() {
+
+	public void recibir() {
 		buzon = new byte[128];
-		pRecibir = new DatagramPacket(buzon, buzon.length);
+		packete = new DatagramPacket(buzon, buzon.length);
 		try {
-			//Recibe el paquete
-			socket.receive(pRecibir);
-			//Deserializa
-			Mensaje mensaje = deserializar(pRecibir.getData());
-			//Usuario que ingresa
-			System.out.println(mensaje.getNombre() + " " + mensaje.getContra());
-			//Agrega el usuario al XML
-			xml.addUser(mensaje.getNombre(), mensaje.getContra());
+			// Recibe el paquete
+			socket.receive(packete);
+			// Deserializa
+			Mensaje mensaje = deserializar(packete.getData());
+			// Usuario que ingresa
+			if (mensaje.getSolicitud() == 0) {
+				System.out.println(mensaje.getNombre() + " " + mensaje.getContra());
+				// Agrega el usuario al XML
+				xml.addUser(mensaje.getNombre(), mensaje.getApellido(), mensaje.getContra(), mensaje.getNickName());
+			}
+			if (mensaje.getSolicitud() == 1) {
+				if (xml.validate(mensaje.getNickName(), mensaje.getContra()) == 0) {
+					enviar("No existe");
+				}
+				if (xml.validate(mensaje.getNickName(), mensaje.getContra()) == 1) {
+					enviar("Bienvenido");
+				}
+				if (xml.validate(mensaje.getNickName(), mensaje.getContra()) == 1) {
+					enviar("Contraseña Incorrecta");
+				}
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
+	public void enviar(String comando) {
+		try {
+			byte[] command = comando.getBytes();
+			packete = new DatagramPacket(command, command.length, PORT);
+			socket.send(packete);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 
-//Serializa
-	public byte[] serializar(Object obj) throws IOException {
+	// Serializa
+	public byte[] serializar(Object obj) {
 		byte[] datos = null;
 		ByteArrayOutputStream byteOut;
 		ObjectOutputStream objectOut;
@@ -75,14 +98,13 @@ public void recibir() {
 			objectOut.close();
 			datos = byteOut.toByteArray();
 		} catch (IOException e) {
-//Fasha
+			// Fasha
 		}
 		return datos;
 	}
 
-	
-	//Deserializa
-	public Mensaje deserializar(byte[] des){
+	// Deserializa
+	public Mensaje deserializar(byte[] des) {
 		Mensaje obj = null;
 		ByteArrayInputStream byteIn;
 		ObjectInputStream objectIn;
@@ -91,9 +113,9 @@ public void recibir() {
 			objectIn = new ObjectInputStream(byteIn);
 			obj = (Mensaje) objectIn.readObject();
 		} catch (IOException e) {
-			//Fasha
+			// Fasha
 		} catch (ClassNotFoundException e) {
-			//Fasha again
+			// Fasha again
 		}
 		return obj;
 	}
