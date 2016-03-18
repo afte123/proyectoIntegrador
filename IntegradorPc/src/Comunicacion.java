@@ -13,102 +13,89 @@ import comun.Mensaje;
 import processing.core.*;
 public class Comunicacion extends Thread {
 	//Mensaje mensaje;
+
 	private final int PORT = 5000;
 	private DatagramSocket socket;
-	private String command="";
 	private byte[] buzon;
 	private DatagramPacket pRecibir;
-	//dddddd
-	Comunicacion(){
-
+	//Declaramos la clase de manejo de XML
+	private XMLUsers xml;
+	
+	Comunicacion(PApplet app){
 		try {
-			// Initialize the DatagramSocket to receive commands
+			xml = new XMLUsers(app);
+			//La inicializamos
 			socket = new DatagramSocket(PORT);
 			System.out.println("UDP socket open and waiting data");
-
-			// Create the buffer and the receiving packet
-			byte[] buffer = new byte[2364];
-			//packet = new DatagramPacket(buffer, buffer.length);
-
 		} catch (SocketException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	
-	
-
 	public void run() {
-		
 		while (true) {
-			
 			try {
-				// Receive packets and process the information
+				//Recibimos mensajes constantemente
 				recibir();
 				sleep(10);
-				
-				
 			}catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
 	}
 	
 public void recibir() {
-		
-		buzon = new byte[2225];
+		buzon = new byte[128];
 		pRecibir = new DatagramPacket(buzon, buzon.length);
-		
 		try {
+			//Recibe el paquete
 			socket.receive(pRecibir);
+			//Deserializa
 			Mensaje mensaje = deserializar(pRecibir.getData());
-			
-			//Object obj = deserializar(buzon);
-			System.out.println(mensaje.getNombre());
+			//Usuario que ingresa
+			System.out.println(mensaje.getNombre() + " " + mensaje.getContra());
+			//Agrega el usuario al XML
+			xml.addUser(mensaje.getNombre(), mensaje.getContra());
 		} catch (Exception e) {
-			// TODO: handle exception
 			e.printStackTrace();
 		}
-		
-
-
-
 	}
-	
-	
-	
-	
-	
-	
+
+
+//Serializa
 	public byte[] serializar(Object obj) throws IOException {
-		ByteArrayOutputStream bos = new ByteArrayOutputStream();
-		ObjectOutput oos = new ObjectOutputStream(bos);
+		byte[] datos = null;
+		ByteArrayOutputStream byteOut;
+		ObjectOutputStream objectOut;
 
-		oos.writeObject(obj);
-		oos.close();
-		return bos.toByteArray();
-
+		try {
+			byteOut = new ByteArrayOutputStream();
+			objectOut = new ObjectOutputStream(byteOut);
+			objectOut.writeObject(obj);
+			objectOut.close();
+			datos = byteOut.toByteArray();
+		} catch (IOException e) {
+//Fasha
+		}
+		return datos;
 	}
 
+	
+	//Deserializa
 	public Mensaje deserializar(byte[] des){
-		ByteArrayInputStream bais = new ByteArrayInputStream(des);
-		Mensaje msj=null;
-		
+		Mensaje obj = null;
+		ByteArrayInputStream byteIn;
+		ObjectInputStream objectIn;
 		try {
-			ObjectInputStream is = new ObjectInputStream(bais);
-			msj = (Mensaje) is.readObject();
-			is.close();
-			
-		} catch (Exception e) {
-			// TODO: handle exception
-			e.printStackTrace();
-			
-
+			byteIn = new ByteArrayInputStream(des);
+			objectIn = new ObjectInputStream(byteIn);
+			obj = (Mensaje) objectIn.readObject();
+		} catch (IOException e) {
+			//Fasha
+		} catch (ClassNotFoundException e) {
+			//Fasha again
 		}
-
-		return msj;
+		return obj;
 	}
 
 }

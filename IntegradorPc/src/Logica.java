@@ -11,7 +11,7 @@ ArrayList <String> contrasenas;
 		this.app=app;
 		nombres = new ArrayList();
 		contrasenas = new ArrayList();
-		com = new Comunicacion();
+		com = new Comunicacion(app);
 		com.start();
 	}
 }
