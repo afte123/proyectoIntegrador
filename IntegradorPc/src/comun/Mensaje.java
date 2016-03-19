@@ -3,11 +3,11 @@ package comun;
 import java.io.Serializable;
 
 public class Mensaje implements Serializable {
-	  String nombre, contra, nickName, apellido;
-	    int solicitud;
+	   String nombre, contra, nickName, apellido;
+	    String solicitud;
 
 
-	    public Mensaje (int solicitud, String nombre, String apellido,  String contra, String nickName){
+	    public Mensaje (String solicitud, String nombre, String apellido,  String contra, String nickName){
 	        this.solicitud=solicitud;
 	        this.nombre=nombre;
 	        this.apellido=apellido;
@@ -15,17 +15,17 @@ public class Mensaje implements Serializable {
 	        this.nickName=nickName;
 	    }
 
-	    public Mensaje (int solicitud, String nickName,  String contra){
+	    public Mensaje (String solicitud, String nickName,  String contra){
 	        this.solicitud=solicitud;
 	        this.contra=contra;
 	        this.nickName=nickName;
 	    }
 
-	    public Mensaje (int solicitud){
+	    public Mensaje (String solicitud){
 	        this.solicitud=solicitud;
 	    }
 
-	    public int getSolicitud() {
+	    public String getSolicitud() {
 	        return solicitud;
 	    }
 

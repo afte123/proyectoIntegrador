@@ -6,6 +6,7 @@ import java.io.ObjectOutput;
 import java.io.ObjectOutputStream;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
 import java.net.SocketException;
 
 import comun.Mensaje;
@@ -45,28 +46,29 @@ public class Comunicacion extends Thread {
 	}
 
 	public void recibir() {
-		buzon = new byte[128];
+		buzon = new byte[1024];
 		packete = new DatagramPacket(buzon, buzon.length);
 		try {
 			// Recibe el paquete
 			socket.receive(packete);
+			InetAddress ip = packete.getAddress();
 			// Deserializa
 			Mensaje mensaje = deserializar(packete.getData());
 			// Usuario que ingresa
-			if (mensaje.getSolicitud() == 0) {
-				System.out.println(mensaje.getNombre() + " " + mensaje.getContra());
+			if (mensaje.getSolicitud() == "Registro") {
+				//System.out.println(mensaje.getNombre() + " " + mensaje.getContra() + " " + mensaje.getSolicitud());
 				// Agrega el usuario al XML
 				xml.addUser(mensaje.getNombre(), mensaje.getApellido(), mensaje.getContra(), mensaje.getNickName());
 			}
-			if (mensaje.getSolicitud() == 1) {
+			if (mensaje.getSolicitud().equals("Login")) {
 				if (xml.validate(mensaje.getNickName(), mensaje.getContra()) == 0) {
-					enviar("No existe");
+					enviar("No existe", ip);
 				}
 				if (xml.validate(mensaje.getNickName(), mensaje.getContra()) == 1) {
-					enviar("Bienvenido");
+					enviar("Bienvenido", ip);
 				}
 				if (xml.validate(mensaje.getNickName(), mensaje.getContra()) == 1) {
-					enviar("Contraseña Incorrecta");
+					enviar("Contrasena Incorrecta", ip);
 				}
 			}
 		} catch (Exception e) {
@@ -74,14 +76,17 @@ public class Comunicacion extends Thread {
 		}
 	}
 
-	public void enviar(String comando) {
+
+
+	public void enviar(String comando, InetAddress ip) {
+		byte[] datos = comando.getBytes();
 		try {
-			byte[] command = comando.getBytes();
-			packete = new DatagramPacket(command, command.length, PORT);
-			socket.send(packete);
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
+			DatagramPacket packetes = new DatagramPacket(datos, datos.length, ip, PORT);
+			socket.send(packetes);
+			packete = null;
+		} catch (Exception e) {
 			e.printStackTrace();
+			// TODO: handle exception
 		}
 	}
 
