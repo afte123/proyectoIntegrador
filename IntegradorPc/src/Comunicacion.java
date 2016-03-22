@@ -56,19 +56,24 @@ public class Comunicacion extends Thread {
 			Mensaje mensaje = deserializar(packete.getData());
 			// Usuario que ingresa
 			if (mensaje.getSolicitud() == "Registro") {
-				//System.out.println(mensaje.getNombre() + " " + mensaje.getContra() + " " + mensaje.getSolicitud());
+				System.out.println(mensaje.getNombre() + " " + mensaje.getContra() + " " + mensaje.getSolicitud());
 				// Agrega el usuario al XML
 				xml.addUser(mensaje.getNombre(), mensaje.getApellido(), mensaje.getContra(), mensaje.getNickName());
 			}
 			if (mensaje.getSolicitud().equals("Login")) {
-				if (xml.validate(mensaje.getNickName(), mensaje.getContra()) == 0) {
+				int result = xml.validate(mensaje.getNickName(), mensaje.getContra());
+				System.out.println("Resultado validación " + result);
+				if (result == 0) {
 					enviar("No existe", ip);
+					System.out.println("Ste men no existe");
 				}
-				if (xml.validate(mensaje.getNickName(), mensaje.getContra()) == 1) {
+				if (result == 1) {
 					enviar("Bienvenido", ip);
+					System.out.println("Holi");
 				}
-				if (xml.validate(mensaje.getNickName(), mensaje.getContra()) == 1) {
+				if (result == 1) {
 					enviar("Contrasena Incorrecta", ip);
+					System.out.println("Error");
 				}
 			}
 		} catch (Exception e) {
