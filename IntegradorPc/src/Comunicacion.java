@@ -55,7 +55,7 @@ public class Comunicacion extends Thread {
 			// Deserializa
 			Mensaje mensaje = deserializar(packete.getData());
 			// Usuario que ingresa
-			if (mensaje.getSolicitud() == "Registro") {
+			if (mensaje.getSolicitud().equals("Registro")) {
 				System.out.println(mensaje.getNombre() + " " + mensaje.getContra() + " " + mensaje.getSolicitud());
 				// Agrega el usuario al XML
 				xml.addUser(mensaje.getNombre(), mensaje.getApellido(), mensaje.getContra(), mensaje.getNickName());
